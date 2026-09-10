@@ -42,6 +42,26 @@
 
 ## Reporting Rule
 
+### Evidence Rule
+
+Only claim a verification item passed when that specific check was
+actually performed.
+
+Do not infer that an item passed because:
+
+- the code appears correct,
+- a related flow passed,
+- the build succeeded,
+- the feature was implemented,
+- or another verification step passed.
+
+When a required check was not performed, explicitly report it as
+not verified.
+
+Do not use broad claims such as "fully verified", "end-to-end
+verified", or "all tests passed" unless the evidence supports the
+full scope of that claim.
+
 State exactly what was verified, what was partially checked, and what still requires human verification.
 
 Never claim a human-verification item was fully verified.
