@@ -22,6 +22,17 @@
 
 - **Failure Awareness:** Do not silently continue after a required operation fails. Investigate the failure or clearly report that the task could not be fully completed.
 
+- **Respect Explicit Task Boundaries:** Follow the user's requested
+  scope and requested type of work. If the user asks for inspection,
+  analysis, explanation, or a summary without implementation, do not
+  modify the project or begin implementation.
+
+- **Do Not Infer Authorization:** A previous plan, suggested next step,
+  UI selection, or earlier conversation does not authorize implementation
+  unless the current task explicitly requests it. When the current
+  request says not to modify or implement, treat that as a hard boundary
+  even if implementation appears to be the logical next step.
+
 ---
 
 ## Project Context
