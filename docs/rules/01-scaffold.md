@@ -4,19 +4,22 @@
 
 ### Purpose
 
-A task management web application that allows authenticated users
-to organize work into projects and manage tasks within those projects.
+IssueBoard is a small team issue-tracking application for organizing
+projects and managing issues collaboratively.
+
+The application is intended to provide a simple alternative to heavier
+issue-tracking platforms, allowing users to create projects, manage
+project membership, create and work on issues, and review project activity.
 
 ### Target Users
 
-Authenticated users who need to organize and track tasks across
-multiple projects.
+Small teams that need to organize and track work across shared projects.
 
 ### Core Outcome
 
-Users can create projects, create and manage tasks within those
-projects, track task status, and view project and task summaries
-from a dashboard.
+Users should be able to securely manage projects and collaborate on issues
+while maintaining clear ownership, membership boundaries, and project
+history.
 
 
 ## Technology Stack
@@ -30,119 +33,151 @@ from a dashboard.
 
 ### Backend / Data
 
-- Supabase for authentication and persistent database storage
-- Supabase database security policies for user data access control
+- Supabase
+- Supabase Authentication
+- Supabase PostgreSQL
+- Row Level Security (RLS)
 
 ### External Services
 
-- Supabase is the only external service required by the current
-  architecture.
+None.
 
 
 ## Architecture
 
 ### Application Structure
 
-The application should use a simple React/TypeScript architecture.
+The application consists of:
 
-Authentication, projects, tasks, and dashboard functionality should
-have clear responsibilities without introducing unnecessary
-architectural layers.
+- An authentication layer for registration, login, and session management.
+- A project-management layer for project ownership, membership, and
+  archive state.
+- An issue-management layer for issues belonging to projects.
+- A dashboard for project and issue summaries.
+- A project activity-history layer for recording meaningful changes.
+- Shared UI components and utilities following the existing project
+  organization.
 
-Use the existing project structure and conventions when adding new
-functionality.
+Keep responsibilities separated without introducing unnecessary
+abstraction.
 
 ### Data Flow
 
-Users interact with the application through the React frontend.
+Users authenticate through Supabase Authentication.
 
-Authentication and application data are handled through Supabase.
+Authenticated users interact with projects and issues through the
+application's data layer.
 
-Projects and tasks are persisted in the Supabase database.
+Projects determine the authorization boundary for their issues,
+memberships, and activity history.
 
-A user's project and task data must remain isolated from other users.
+Issues belong to projects and may be assigned only to members of the
+corresponding project.
+
+Activity records belong to projects and preserve a historical record of
+meaningful project and issue actions.
+
+Database security policies must enforce access boundaries rather than
+depending solely on frontend filtering.
 
 ### Authentication & Authorization
 
-Users authenticate through Supabase Authentication.
+Users must authenticate before accessing application data.
 
-Users can create and manage their own projects.
+A user may access a project only when they are either:
 
-Tasks belong to projects and users must only be able to access tasks
-belonging to projects they are authorized to access.
+- the project owner, or
+- a member of the project.
 
-User data access must be enforced at the database/security layer,
-not only through frontend visibility checks.
+Issue access follows the user's authorization to its project.
+
+Only project owners may manage project membership.
+
+Issue assignment must only allow members of the corresponding project.
+
+Activity history must only be visible to users authorized to access its
+project.
+
+Authorization must be enforced at the database/server boundary, not only
+through UI visibility checks.
 
 
 ## Core Features
 
-- User authentication
-- User account access
+- Email/password authentication
 - Project creation
-- Project management
-- Task creation inside projects
-- Task title
-- Task description
-- Task status
-- Todo status
-- In-progress status
-- Done status
-- Dashboard showing projects
-- Dashboard showing task counts
-- Persistent database storage
-- Responsive desktop interface
-- Responsive mobile interface
+- Project renaming
+- Project archiving
+- Project membership
+- Issue creation
+- Issue editing
+- Issue deletion
+- Issue status management
+- Issue priority management
+- Issue assignment
+- Project dashboard
+- Issue counts and status summaries
+- Recently updated issues
+- Project activity history
+- Responsive desktop/mobile interface
 
 
 ## Code Organization
 
-- Feature-specific code → follow the existing project structure and
-  conventions.
-- Shared UI → use the existing shared component system and shadcn/ui
-  components where appropriate.
-- Utilities → use the project's established utility location.
-- Supabase/data logic → keep data access consistent with the existing
-  Supabase integration patterns.
+- New project-related functionality → existing project-management area
+- New issue-related functionality → existing issue-management area
+- Shared UI → existing shared component patterns
+- Data access → existing Supabase/data-access patterns
+- Authentication → existing authentication patterns
+- Database changes → Supabase migrations/schema mechanisms already used
+  by the project
 
-Prefer extending existing patterns over creating competing patterns.
-
-Do not reproduce the complete file tree here. The actual codebase is
-the source of truth for individual files and implementation details.
+Follow the existing project structure rather than introducing a parallel
+architecture.
 
 
 ## Constraints & Invariants
 
-- Keep the architecture simple.
-- Do not introduce Redux or another global state-management library
-  without a demonstrated architectural need.
-- Do not add external services unless they are genuinely required.
-- Users must only be able to access their own projects.
-- Users must only be able to access tasks they are authorized to access.
-- Authorization must not rely solely on client-side checks.
-- Database-level access controls must protect user-owned data.
-- New functionality should follow established project patterns.
-- Do not unnecessarily rewrite working functionality.
+- Users must never gain access to projects they do not own or belong to.
+- Users must never gain access to issues belonging to unauthorized
+  projects.
+- Project membership must be enforced server-side/database-side.
+- Only project owners can manage project membership.
+- Issues can only be assigned to members of their project.
+- Archived projects must not accept new issues.
+- Archived projects must retain their existing issues and historical data.
+- Existing project and issue data must not be lost during feature changes.
+- Existing authentication and authorization behavior must remain intact.
+- Activity history must survive deletion of the entity it describes.
+- Activity history must remain available after a project is archived.
+- Activity records must identify the actual authenticated user who
+  performed the action.
+- Historical records must not allow one user to impersonate another.
+- Do not introduce Redux or another global state-management library.
+- Do not introduce external services unless genuinely required.
+- Avoid unnecessary dependencies and abstractions.
 
 
 ## External Service Boundaries
 
-- Supabase → authentication and persistent application data.
-- Supabase database security policies → enforce access boundaries for
-  user-owned projects and tasks.
+- Supabase Authentication → user authentication and session management.
+- Supabase PostgreSQL → persistent application data.
+- Supabase RLS → database-level authorization boundaries.
 
-No additional external service is currently part of the architecture.
-
-Do not introduce one without a genuine requirement.
+Do not move authorization responsibility to an external service or rely
+solely on frontend checks.
 
 
 ## Rejected Approaches
 
-- Redux / unnecessary global state management → rejected to keep the
-  architecture simple.
-- Additional external services → rejected unless genuinely required.
-- Client-only authorization → rejected because user data must be
-  protected at the database/security layer.
+- Redux or another global state-management library → unnecessary for the
+  application's expected complexity.
+- External activity/logging service → unnecessary; project history should
+  remain part of the application's own data model.
+- Client-only authorization → insufficient for protecting project,
+  issue, membership, and activity data.
+- Replacing the existing architecture for individual features →
+  unnecessary risk and unnecessary scope.
 
 
 ## Maintaining This Scaffold
@@ -151,14 +186,13 @@ Do not introduce one without a genuine requirement.
   requirements.
 - Do not use it as a progress log; progress belongs in
   `docs/PROJECT-STATE.md`.
-- Do not duplicate information that can be reliably discovered from
-  the codebase.
-- Update this document when the project's intended architecture,
-  stack, major feature set, constraints, or important boundaries
-  change.
+- Do not duplicate information that can be reliably discovered from the
+  codebase.
+- Update this document when the project's intended architecture, stack,
+  major feature set, constraints, or important boundaries change.
 - Do not update it for routine implementation progress.
-- Never invent architectural decisions that the project has not
-  actually made.
+- Never invent architectural decisions that the project has not actually
+  made.
 - If this document conflicts with the actual implementation, stop and
   determine whether the code or the scaffold represents the intended
   state before making a consequential change.
