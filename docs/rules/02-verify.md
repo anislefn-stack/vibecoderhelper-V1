@@ -8,7 +8,10 @@
 
 3. **Runtime:** Exercise the changed flow and check for runtime/console errors.
 
-4. **UI:** Check the changed interface at desktop and mobile widths where relevant.
+4. **UI Viewport Verification:**
+   - If interactive browser testing or preview visual logs are available: Actually exercise the interface at both desktop and mobile widths.
+   - If browser testing is NOT available: inspect responsive implementation and mark visual behavior **NOT VERIFIED**.
+   - _CRITICAL:_ Never treat the mere presence of responsive utility classes as evidence that the UI was visually verified.
 
 5. **UI States:** When relevant, verify loading, empty, success, error, and invalid-input states.
 
@@ -29,39 +32,14 @@
 ## I must flag for human verification
 
 - Requirement match: I implemented what I understood; the user must confirm it matches their intended result.
-
 - Multi-role authorization: test every relevant role when not all roles can be exercised.
-
 - Live third-party operations: real payments, emails, external writes, or other actions requiring live credentials/state.
-
 - Real-device behavior: desktop/mobile browser checks do not certify physical devices.
-
 - Untested adjacent functionality: I did not verify unrelated or non-obvious flows.
-
 - Visual/UX judgment: functional correctness does not prove that the result looks or feels right.
 
 ## Reporting Rule
 
 ### Evidence Rule
 
-Only claim a verification item passed when that specific check was
-actually performed.
-
-Do not infer that an item passed because:
-
-- the code appears correct,
-- a related flow passed,
-- the build succeeded,
-- the feature was implemented,
-- or another verification step passed.
-
-When a required check was not performed, explicitly report it as
-not verified.
-
-Do not use broad claims such as "fully verified", "end-to-end
-verified", or "all tests passed" unless the evidence supports the
-full scope of that claim.
-
-State exactly what was verified, what was partially checked, and what still requires human verification.
-
-Never claim a human-verification item was fully verified.
+Only claim a verification item passed when that specific check was actually performed. Do not infer that an item passed because the code appears correct or the build succeeded. When a required check was not performed, explicitly report it as **NOT VERIFIED**.
