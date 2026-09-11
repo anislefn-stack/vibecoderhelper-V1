@@ -22,16 +22,21 @@
 
 - **Failure Awareness:** Do not silently continue after a required operation fails. Investigate the failure or clearly report that the task could not be fully completed.
 
-- **Respect Explicit Task Boundaries:** Follow the user's requested
-  scope and requested type of work. If the user asks for inspection,
-  analysis, explanation, or a summary without implementation, do not
-  modify the project or begin implementation.
+- **Respect Explicit Task Boundaries:** Follow the user's requested scope and requested type of work. If the user asks for inspection, analysis, explanation, or a summary without implementation, do not modify the project or begin implementation.
 
-- **Do Not Infer Authorization:** A previous plan, suggested next step,
-  UI selection, or earlier conversation does not authorize implementation
-  unless the current task explicitly requests it. When the current
-  request says not to modify or implement, treat that as a hard boundary
-  even if implementation appears to be the logical next step.
+- **Do Not Infer Authorization:** A previous plan, suggested next step, UI selection, or earlier conversation does not authorize implementation unless the current task explicitly requests it. When the current request says not to modify or implement, treat it as a hard boundary even if implementation appears to be the logical next step.
+
+- **Root Cause Before Repeated Fixes:** If a problem persists after an attempted fix, inspect the surrounding implementation and relevant parent/child dependencies before making another change. Prefer correcting the underlying cause over accumulating patches.
+
+- **Treat Failed Fixes as Evidence:** When the user reports that a previous change did not solve the problem, do not simply repeat or lightly modify the previous approach. Re-examine the relevant implementation and determine why the previous fix was insufficient before making another change.
+
+- **Verify the Actual Failure:** When fixing a reported bug, verify the specific behavior that originally failed. Do not assume that a related or similar check proves the original problem is fixed.
+
+- **Do Not Declare Victory Early:** Successful code generation, a successful build, or a plausible-looking implementation is not proof that the requested behavior works. Completion claims must be based on actual evidence.
+
+- **Investigate Before Patching:** When behavior is unexpected, inspect the relevant code path and surrounding dependencies before applying a superficial fix. Prefer understanding the failure mechanism over adding defensive patches blindly.
+
+- **Stop When the Task Is Complete:** Once the requested change is correctly implemented and verified to the appropriate level, do not introduce unrelated improvements, refactors, or additional features.
 
 ---
 
@@ -43,7 +48,11 @@
 
 - **Use the Codebase as Evidence:** Treat the existing implementation as an important source of truth. Do not invent existing patterns, functionality, or architectural decisions that are not present in the project documentation or code.
 
----
+- **Root Cause Before Repeated Fixes:** If a problem persists after an attempted fix, inspect the surrounding implementation and relevant parent/child dependencies before making another change. Prefer correcting the underlying cause over accumulating patches.
+
+- **Contextual State Initialization:** If `docs/PROJECT-STATE.md` reads "Not started" or is completely empty:
+  - If the user's initial prompt already establishes a clear, sufficient product scope, proceed immediately with the implementation and initialize the tracking log in `PROJECT-STATE.md` as part of your first completed task turn.
+  - If the user's request is too ambiguous to implement safely without making major architectural assumptions, stop and ask the user for specific clarification before writing any code.
 
 ## Planning
 
@@ -57,8 +66,6 @@
 
 - **Clarify Ambiguity:** If a request is too ambiguous to implement safely without making significant assumptions, inspect the project and clarify the intended result before making consequential changes.
 
----
-
 ## Implementation
 
 - **Senior Discipline:** Write complete, production-ready code using the project's existing stack and conventions. Do not use placeholder implementations when the requested functionality can be implemented properly.
@@ -71,8 +78,6 @@
 
 - **Avoid Unnecessary Dependencies:** Do not add libraries, services, or infrastructure when the existing project can reasonably support the requested functionality without them.
 
----
-
 ## Security
 
 - **Protect Secrets:** Never hard-code API keys, passwords, access tokens, provider credentials, or other secrets. Use the project's approved secret or environment-variable mechanism.
@@ -84,8 +89,6 @@
 - **Validate External Input:** Treat user input and external API data as untrusted. Validate it before performing sensitive operations or database mutations.
 
 - **Risk-Based Safety:** Use stronger safety checks and confirmation for high-risk operations, including destructive changes, production data changes, deployment or publishing, credential changes, and consequential authentication or authorization changes. Do not require unnecessary confirmation for routine, low-risk edits.
-
----
 
 ## Verification
 
@@ -101,8 +104,6 @@
   - Any remaining risks or open issues
 
 - **No False Completion:** A successful code generation step is not proof that the requested functionality works. Do not claim completion based solely on generated code.
-
----
 
 ## State Management
 
